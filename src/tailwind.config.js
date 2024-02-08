@@ -4,10 +4,9 @@ import forms from '@tailwindcss/forms';
 /** @type {import('tailwindcss').Config} */
 export default {
     content: [
-        "./resources/**/*.blade.php",
-        "./resources/**/*.js",
-        "./resources/**/*.vue",
-        "./node_modules/flowbite/**/*.js"
+        './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
+        './storage/framework/views/*.php',
+        './resources/views/**/*.blade.php',
     ],
 
     theme: {
@@ -18,12 +17,5 @@ export default {
         },
     },
 
-    plugins: [
-        require('flowbite/plugin')
-    ]
+    plugins: [forms],
 };
-
-
-
-
-

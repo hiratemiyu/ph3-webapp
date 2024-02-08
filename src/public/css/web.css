@@ -310,9 +310,6 @@ table {
     border-radius: 50%;
     left: -5px;
 }
-input[type="checkbox"] {
-    display: none;
-}
 
 input[type="checkbox"] + label {
     box-sizing: border-box;

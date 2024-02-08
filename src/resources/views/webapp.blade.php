@@ -11,23 +11,118 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('css/web.css') }}">
+
+    <script>
+      let hoursData = @json($hoursData);
+      let labels = @json($labels);
+      let hours = @json($hours).map(Number);
+      let content_labels = @json($content_labels);
+      let content_hours = @json($content_hours).map(Number);
+    </script>
   </head>
 
 <body>
   <header class="header">
-    <div class="header_logo">
-      <img src="../web/img/logo.svg" alt="">
-    </div>
     <div class="header_week">
       <li class="header_week_4th">4th week</li>
     </div>
     <div class="header_record">
-      <button id="header_record_button">記録・投稿</button>
+      <button data-modal-target="crud-modal" data-modal-toggle="crud-modal" class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+        記録・投稿
+      </button>
     </div>
+        <!-- ログアウトボタンを追加 -->
+        <div class="header_logout">
+          <form action="{{ route('logout') }}" method="post">
+              @csrf
+              <button type="submit">ログアウト</button>
+          </form>
+      </div>
   </header>
 
   <main class="main">
     <div class="container">
+      <div id="modal-overlay" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden"></div>  
+      <div id="crud-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed inset-0 z-50 flex justify-center items-center">
+          <div class="relative p-4 w-full max-w-md max-h-full">
+              <!-- Modal content -->
+              <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                  <!-- Modal header -->
+                  <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                      <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="crud-modal">
+                          <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                          </svg>
+                          <span class="sr-only">Close modal</span>
+                      </button>
+                  </div>
+                  <!-- Modal body -->
+                  <form class="p-4 md:p-5">
+                      <div class="grid gap-3 mb-4 grid-cols-2">
+                        <div class="col-span-1">
+                        // 学習日
+                          <div class="col-span-2">
+                              <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">学習日</label>
+                              <input type="date" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Type product name" required="">
+                          </div>
+                          <div class="col-span-2 sm:col-span-1">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">学習コンテンツ（複数選択可能）</label>
+                            <div class="flex flex-col">
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="learningContent[]" value="N予備校" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-gray-300">N予備校</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="learningContent[]" value="ドットインストール" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-gray-300">ドットインストール</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="learningContent[]" value="POSSE課題" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-gray-300">POSSE課題</span>
+                                </label>
+                            </div>
+                          </div>
+
+                          // 学習言語
+                          <div class="col-span-2 sm:col-span-1">
+                              <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">学習言語（複数選択可）</label>
+                              <div class="flex flex-col">
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="learningContent[]" value="HTML" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-gray-300">HTML</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="learningContent[]" value="css" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-gray-300">css</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="learningContent[]" value="JavaaScript" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-gray-300">JavaaScript</span>
+                                </label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-span-2">
+                          // 学習時間
+                          <div class="col-span-2 sm:col-span-1">
+                            <label for="price" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">学習時間</label>
+                            <input type="number" name="price" id="price" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="時間" required="">
+                          </div>                         
+                          // Twitter用コメント
+                          <div class="col-span-2">
+                              <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Twitter用コメント</label>
+                              <textarea id="description" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write product description here"></textarea>                    
+                          </div>
+                      </div>
+                      <button type="submit" class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                          <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+                          Add new product
+                      </button>
+                  </form>
+              </div>
+          </div>
+        </div> 
+      </div>
       <div class="hours_container">
         <div class="hours">
           <ul id="today_hours">
@@ -51,8 +146,8 @@
           var options = {
             series: [{
               name: 'hour',
-              data: [3, 4, 5, 3, 0, 0, 4, 2, 2, 8, 8, 2, 2, 1, 7, 4, 4, 3, 3, 3, 2, 2, 6, 2, 2, 1, 1, 1, 7, 8],
-            }],
+              data: hoursData      
+              }],
             chart: {
               type: 'bar',
               height: 420,
@@ -154,7 +249,7 @@
         <div class="learning_character">
           <p class="learning_title">学習言語</p>
           <div class="character_chart">
-            <div id="learning_character_chart"></div>
+            {{-- <div id="learning_character_chart"></div>
               <ul class="learning_character_detail">
                 <li class="circle circle_js">JavaScript</li>
                 <li class="circle circle_css">CSS</li>
@@ -164,16 +259,20 @@
                 <li class="circle circle_sql">SQL</li>
                 <li class="circle circle_shell">Shell</li>
                 <li class="circle circle_others">情報システム基礎情報（その他）</li>
-              </ul>
+              </ul> --}}
             <div class="learning_chart" id="chart1">
             <script>
+              console.log(hours);
               var options = {
-                series: [44, 55, 13, 43, 22],
+                series: hours,
                 chart: {
                 width: 300,
                 type: 'pie',
               },
-              labels: ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
+              labels: labels,
+              legend: {
+                position: 'bottom' // ここでラベルの位置を下に設定
+              },
               responsive: [{
                 breakpoint: 480,
                 options: {
@@ -195,21 +294,24 @@
 
         <div class="learning_content">
           <p class="learning_title">学習コンテンツ</p>
-          <div id="learning_content_chart"></div>
+          {{-- <div id="learning_content_chart"></div>
           <ul class="learning_content_detail">
             <li class="circle circle_dot">ドットインストール</li>
             <li class="circle circle_N_cramSchool">N予備校</li>
             <li class="circle circle_posse">Posse課題</li>
-          </ul>
-          <div class="canvas_container" id="hours_chart">
+          </ul> --}}
+          <div class="canvas_container" id="content_chart">
             <script>
             var options = {
-              series: [44, 55, 13, 43, 22],
+              series: content_hours,
               chart: {
-              width: 300,
+              width: 350,
               type: 'pie',
             },
-            labels: ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
+            labels:content_labels,
+            legend: {
+                position: 'bottom' // ここでラベルの位置を下に設定
+              },
             responsive: [{
               breakpoint: 480,
               options: {
@@ -222,7 +324,7 @@
               }
             }]
             };
-            var chart = new ApexCharts(document.querySelector("#hours_chart"), options);
+            var chart = new ApexCharts(document.querySelector("#content_chart"), options);
             chart.render();
           </script>
         </div>
@@ -248,7 +350,7 @@
                 <div class="modal_learning_day_detail">
                   <p class="learning_day_title" >学習日</p>
                   <input type="date" name="learning_day_detail" class="learning_day_text">
-                  <!-- <button id="learning_day_detail" placeholder="2022年10月23日"> -->
+                <button id="learning_day_detail" placeholder="2022年10月23日"> 
                 </div>
               </div>
               <div class="modal_learning_content">
@@ -369,3 +471,30 @@
   </main>
 </body>
 </html>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('crud-modal');
+    const overlay = document.getElementById('modal-overlay');
+
+    // モーダル外のオーバーレイをクリックしたときにモーダルを閉じる
+    overlay.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        overlay.classList.add('hidden');
+    });
+
+    // モーダルの内容部分のクリックイベントが親要素へ伝播しないようにする
+    modal.addEventListener('click', (event) => {
+        event.stopPropagation();
+    });
+
+    // モーダルの開閉ボタンの処理（既に実装してあるものと仮定）
+    document.querySelectorAll('[data-modal-toggle="crud-modal"]').forEach(button => {
+        button.addEventListener('click', () => {
+            modal.classList.toggle('hidden');
+            overlay.classList.toggle('hidden');
+        });
+    });
+});
+
+</script>
